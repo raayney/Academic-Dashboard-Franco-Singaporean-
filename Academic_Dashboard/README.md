@@ -1,6 +1,6 @@
 # Academic Dashboard (Franco-Singaporean)
 
-Made this streamlit dashboard for myself initially, I wanted to, in a sense, gamify my studies at university. I began first with the French version, but added the Singaporean version (mainly modeled after NUS' grading system) once a few friends from Singapore asked for the source code. Therefore, it's Franco-Singaporean.
+Made this streamlit dashboard for myself initially as I wanted to visualise the progress of my studies at university. I began first with the French version, but added the Singaporean version (mainly modeled after NUS' grading system) once a few friends from Singapore asked for the source code. Therefore, it's Franco-Singaporean.
 
 ---
 
