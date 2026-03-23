@@ -124,7 +124,7 @@ m2.metric(f"Overall {metric_label}", f"{overall_avg:.2f} {metric_suffix}")
 
 st.divider()
 
-tab_view, tab_edit = st.tabs(["Visual Progress", "⚙️ Settings"])
+tab_view, tab_edit = st.tabs(["Visual Progress", "⚙️"])
 
 with tab_view:
     if not data["subjects"]:
@@ -140,7 +140,7 @@ with tab_view:
                 st.progress(min(score / norm, 1.0))
 
 with tab_edit:
-    with st.expander("🌍 Regional Settings"):
+    with st.expander("Regional Settings"):
         data["system"] = st.selectbox("Select Grading System", ["French", "Singapore"], index=0 if data["system"] == "French" else 1)
         if data["system"] == "Singapore":
             st.write("**Grade Boundaries (A = 5.0, etc.)**")
@@ -148,7 +148,7 @@ with tab_edit:
             for i, (grade, b_val) in enumerate(data["grade_boundaries"].items()):
                 data["grade_boundaries"][grade] = b_cols[i].number_input(grade, value=int(b_val), step=1)
 
-    with st.expander("📊 Past Semesters Data"):
+    with st.expander("Past Semesters Data"):
         data["prev_avg"] = st.number_input("Past Average", value=float(data["prev_avg"]), step=0.01)
         data["prev_ects"] = st.number_input("Past Total Credits", value=int(data["prev_ects"]), step=1)
 
