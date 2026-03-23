@@ -8,9 +8,22 @@ import scipy.stats as stats # Need this for the Bell Curve logic
 USER_DATA_FILE = "my_curriculum.json"
 CUSTOM_CSS = """
     <style>
-    html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, h4, h5, h6, label, span {
+    /* Target only text elements, avoiding icons */
+    html, body, .stMarkdown, p, h1, h2, h3, h4, h5, h6, label, span {
         font-family: "Times New Roman", Times, serif !important;
     }
+
+    /* Fix for Streamlit Expanders and Icons */
+    .st-emotion-cache-p4mowd, .st-emotion-cache-eqo0nr {
+        font-family: "Source Sans Pro", sans-serif !important;
+    }
+
+    /* Specifically target the expander header text to prevent the overlap */
+    div[data-testid="stExpander"] summary p {
+        font-family: "Times New Roman", Times, serif !important;
+        margin-left: 0.5rem;
+    }
+
     .stMetric { border: 1px solid #eeeeee; padding: 10px; border-radius: 5px; }
     div[data-testid="stMetricValue"] { font-size: 1.8rem !important; }
     </style>
