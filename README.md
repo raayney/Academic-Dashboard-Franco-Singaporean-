@@ -29,3 +29,11 @@ Ensure you have Python installed.
 Clone this repo and install these libraries:
 ```bash
 pip install streamlit pandas scipy
+```
+
+### 3. Run
+In your terminal, run:
+```bash
+cd Downloads/Academic-Dashboard-Franco-Singaporean--main/Academic_Dashboard
+streamlit run app.py
+```
