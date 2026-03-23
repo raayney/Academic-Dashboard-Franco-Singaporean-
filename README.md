@@ -13,7 +13,7 @@ If you want to see whether or not this would be useful to you, this is a good pl
    - **On iPhone (Safari):** Tap 'Share' -> 'Add to Home Screen'.
    - **On Android (Chrome):** Tap the three dots -> 'Install app'.
    - **On Laptop (Chrome/Edge):** Click the 'Install' icon in the address bar (right side).
-3. This will put a **🎓 Icon** on your desktop/home screen and open the dashboard in its own clean window.
+3. This will put a **👑 Icon** on your desktop/home screen and open the dashboard in its own clean window.
 
 ---
 
