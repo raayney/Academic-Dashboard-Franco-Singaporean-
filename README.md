@@ -4,6 +4,12 @@ Made this streamlit dashboard for myself initially as I wanted to visualise the 
 
 ---
 
+## Intended Use
+
+I suggest that inputted grades should either be grades that have already been confirmed, or grades of the most recent mock paper attempted.
+
+---
+
 ## Web Version
 
 If you want to see whether or not this would be useful to you, this is a good place to start. However if you're looking for something more long-term, I recommend running this locally on your machine. (Explained below)
