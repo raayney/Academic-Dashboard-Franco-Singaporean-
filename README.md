@@ -4,11 +4,10 @@ Made this streamlit dashboard for myself initially as I wanted to visualise the 
 
 ---
 
-## One-Click
+## Web Version
 
 If you want to see whether or not this would be useful to you, this is a good place to start. However if you're looking for something more long-term, I recommend running this locally on your machine. (Explained below)
 
-If you don't want to install anything, just use the **Web Version**:
 1. Open https://acadash.streamlit.app
 2. **To save it as an App on your Phone/Laptop:**
    - **On iPhone (Safari):** Tap 'Share' -> 'Add to Home Screen'.
