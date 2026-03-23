@@ -2,28 +2,26 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-import scipy.stats as stats # bell curve god 
+import scipy.stats as stats 
 
+# --- CONFIGURATION ---
 USER_DATA_FILE = "my_curriculum.json"
 CUSTOM_CSS = """
     <style>
-    /* Force Times New Roman ONLY on text-heavy elements */
     html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, h4, h5, h6, label, 
     div[data-testid="stExpander"] summary, 
     div[data-testid="stMetricLabel"] {
         font-family: "Times New Roman", Times, serif !important;
     }
 
-    /* PROTECT ICONS: Ensure Streamlit icons and Material symbols remain untouched */
     .stIcon, [data-testid="stIcon"], i, svg, 
     span[data-testid="stWidgetLabel"] > div > div,
     span[class*="material-symbols"], 
-    .st-emotion-cache-16idsys p, /* This targets specific menu text if needed */
+    .st-emotion-cache-16idsys p, 
     [data-testid="stHeader"] * {
         font-family: inherit !important;
     }
 
-    /* Fix the specific overlap in expander headers */
     div[data-testid="stExpander"] summary p {
         display: inline;
         margin-left: 0.5rem;
@@ -34,29 +32,33 @@ CUSTOM_CSS = """
     </style>
 """
 
-def load_data():
-    if os.path.exists(USER_DATA_FILE):
-        with open(USER_DATA_FILE, "r") as f:
-            d = json.load(f)
-            # Migration/Defaulting for new settings
-            if "system" not in d: d["system"] = "French"
-            if "grade_boundaries" not in d:
-                d["grade_boundaries"] = {"A": 80, "A-": 75, "B+": 70, "B": 65, "B-": 60, "C+": 55, "C": 50}
-            return d
-    return {
-        "system": "French", 
-        "prev_avg": 0.0, 
-        "prev_ects": 0, 
-        "subjects": {},
-        "grade_boundaries": {"A": 80, "A-": 75, "B+": 70, "B": 65, "B-": 60, "C+": 55, "C": 50}
-    }
+# --- DATA MANAGEMENT (Private to the user's browser) ---
+def initialize_data():
+    if "user_data" not in st.session_state:
+        if os.path.exists(USER_DATA_FILE):
+            with open(USER_DATA_FILE, "r") as f:
+                st.session_state.user_data = json.load(f)
+        else:
+            st.session_state.user_data = {
+                "system": "French", 
+                "prev_avg": 0.0, 
+                "prev_ects": 0, 
+                "subjects": {},
+                "grade_boundaries": {"A": 80, "A-": 75, "B+": 70, "B": 65, "B-": 60, "C+": 55, "C": 50}
+            }
+    return st.session_state.user_data
 
-def save_data(data):
-    with open(USER_DATA_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+def save_data(data_to_save):
+    st.session_state.user_data = data_to_save
+    try:
+        with open(USER_DATA_FILE, "w") as f:
+            json.dump(data_to_save, f, indent=4)
+    except:
+        pass 
+
+data = initialize_data()
 
 def get_cap_from_percent(percent, boundaries):
-    # Standard NUS CAP mapping
     if percent >= boundaries["A"]: return 5.0
     if percent >= boundaries["A-"]: return 4.5
     if percent >= boundaries["B+"]: return 4.0
@@ -66,39 +68,34 @@ def get_cap_from_percent(percent, boundaries):
     if percent >= boundaries["C"]: return 2.0
     return 0.0
 
-data = load_data()
-
 # --- CALCULATIONS ---
 current_weighted_sum = 0.0
-total_current_weight = 0.0 # ECTS or MCs
+total_current_weight = 0.0 
 subject_final_scores = {}
 
 for sub_name, info in data["subjects"].items():
     comp_sum = sum(c['weight'] for c in info['components'].values())
     if comp_sum == 100:
-        # Calculate raw score (%)
         raw_score = sum(c['grade'] * (c['weight'] / 100) for c in info['components'].values())
-        
-        # Apply Bell Curve if applicable (Singapore System Only)
         final_score = raw_score
+        
         if data["system"] == "Singapore" and info.get("bell_curve"):
             method = info.get("bc_method")
             try:
                 if method == "Mean/SD":
                     mu, sigma = info["bc_mean"], info["bc_sd"]
-                else: # Min/Max estimation
+                else: 
                     mu = info["bc_mean"]
                     sigma = (info["bc_max"] - info["bc_min"]) / 6
                 
-                # z-score to Percentile
                 z = (raw_score - mu) / sigma if sigma != 0 else 0
                 final_score = stats.norm.cdf(z) * 100
-            except: final_score = raw_score
+            except: 
+                final_score = raw_score
 
-        # System-specific weighting
         if data["system"] == "French":
             val = final_score
-        else: # Singapore CAP
+        else: 
             val = get_cap_from_percent(final_score, data["grade_boundaries"])
         
         subject_final_scores[sub_name] = val
@@ -115,7 +112,6 @@ st.set_page_config(page_title="Academic Tracker", layout="wide")
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 st.title("Academic Progress Dashboard")
 
-# Top Metrics
 m1, m2 = st.columns(2)
 metric_label = "Moyenne Générale" if data["system"] == "French" else "Semester CAP"
 metric_suffix = "/ 20" if data["system"] == "French" else "/ 5.0"
@@ -124,7 +120,6 @@ m2.metric(f"Overall {metric_label}", f"{overall_avg:.2f} {metric_suffix}")
 
 st.divider()
 
-# --- TABS ---
 tab_view, tab_edit = st.tabs(["Visual Progress", "⚙️"])
 
 with tab_view:
@@ -137,12 +132,10 @@ with tab_view:
                 st.write(f"**{sub_name}**")
                 st.caption(f"Final: {score:.2f} {metric_suffix}")
             with col_bar:
-                # Normalising for bar (French is /20, Sg is /5)
                 norm = 20.0 if data["system"] == "French" else 5.0
                 st.progress(min(score / norm, 1.0))
 
 with tab_edit:
-    # 1. System Selection
     with st.expander("Regional Settings"):
         data["system"] = st.selectbox("Select Grading System", ["French", "Singapore"], index=0 if data["system"] == "French" else 1)
         if data["system"] == "Singapore":
@@ -151,12 +144,10 @@ with tab_edit:
             for i, (grade, b_val) in enumerate(data["grade_boundaries"].items()):
                 data["grade_boundaries"][grade] = b_cols[i].number_input(grade, value=int(b_val), step=1)
 
-    # 2. Previous Data
     with st.expander("Past Semesters Data"):
         data["prev_avg"] = st.number_input("Past Average", value=float(data["prev_avg"]), step=0.01)
         data["prev_ects"] = st.number_input("Past Total Credits", value=int(data["prev_ects"]), step=1)
 
-    # 3. Add Subject
     with st.expander("Add New Course"):
         n_col1, n_col2 = st.columns([3, 1])
         new_sub = n_col1.text_input("Course Name")
@@ -167,12 +158,18 @@ with tab_edit:
                 save_data(data)
                 st.rerun()
 
+    with st.expander("💾 Backup & Restore Data"):
+        st.download_button(label="Download My Data (.json)", data=json.dumps(data, indent=4), file_name="my_grades.json", mime="application/json")
+        uploaded_file = st.file_uploader("Upload Save File", type="json")
+        if uploaded_file is not None:
+            st.session_state.user_data = json.load(uploaded_file)
+            save_data(st.session_state.user_data)
+            st.rerun()
+
     st.divider()
 
-    # 4. Edit Subjects
     for sub_name, info in list(data["subjects"].items()):
         with st.expander(f"Edit {sub_name}"):
-            # Singapore bell curve settings
             if data["system"] == "Singapore":
                 info["bell_curve"] = st.checkbox("Enable Bell Curve Calculation", value=info.get("bell_curve", False), key=f"bc_{sub_name}")
                 if info["bell_curve"]:
@@ -186,10 +183,8 @@ with tab_edit:
                         info["bc_min"] = m_col1.number_input("Min Score (%)", value=float(info.get("bc_min", 0.0)), key=f"bmin_{sub_name}")
                         info["bc_max"] = m_col2.number_input("Max Score (%)", value=float(info.get("bc_max", 100.0)), key=f"bmax_{sub_name}")
 
-            # Components
             for c_name, c_data in list(info["components"].items()):
                 ca, cb, cc = st.columns([2, 2, 1])
-                # In Sg, grades are usually % / 100. In France, / 20.
                 limit = 100.0 if data["system"] == "Singapore" else 20.0
                 g = ca.number_input(f"Grade: {c_name}", 0.0, limit, float(c_data['grade']), key=f"g_{sub_name}_{c_name}")
                 w = cb.number_input(f"Weight %: {c_name}", 0, 100, int(c_data['weight']), key=f"w_{sub_name}_{c_name}")
