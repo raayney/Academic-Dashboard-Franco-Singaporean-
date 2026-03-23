@@ -6,8 +6,8 @@ Made this streamlit dashboard for myself initially as I wanted to visualise the 
 
 ## One-Click-Download
 
-If you don't want to install anything, the easiest way is to use the **Web Version**:
-1. Open the [Insert your Streamlit Cloud Link Here]
+If you don't want to install anything, just use the **Web Version**:
+1. Open https://acadash.streamlit.app
 2. **To save it as an App on your Phone/Laptop:**
    - **On iPhone (Safari):** Tap 'Share' -> 'Add to Home Screen'.
    - **On Android (Chrome):** Tap the three dots -> 'Install app'.
