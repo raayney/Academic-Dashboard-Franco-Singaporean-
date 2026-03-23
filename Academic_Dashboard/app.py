@@ -2,25 +2,30 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-import scipy.stats as stats # Need this for the Bell Curve logic
+import scipy.stats as stats # bell curve god 
 
-# --- CONFIGURATION ---
 USER_DATA_FILE = "my_curriculum.json"
 CUSTOM_CSS = """
     <style>
-    /* Target only text elements, avoiding icons */
-    html, body, .stMarkdown, p, h1, h2, h3, h4, h5, h6, label, span {
+    /* Force Times New Roman ONLY on text-heavy elements */
+    html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, h4, h5, h6, label, 
+    div[data-testid="stExpander"] summary, 
+    div[data-testid="stMetricLabel"] {
         font-family: "Times New Roman", Times, serif !important;
     }
 
-    /* Fix for Streamlit Expanders and Icons */
-    .st-emotion-cache-p4mowd, .st-emotion-cache-eqo0nr {
-        font-family: "Source Sans Pro", sans-serif !important;
+    /* PROTECT ICONS: Ensure Streamlit icons and Material symbols remain untouched */
+    .stIcon, [data-testid="stIcon"], i, svg, 
+    span[data-testid="stWidgetLabel"] > div > div,
+    span[class*="material-symbols"], 
+    .st-emotion-cache-16idsys p, /* This targets specific menu text if needed */
+    [data-testid="stHeader"] * {
+        font-family: inherit !important;
     }
 
-    /* Specifically target the expander header text to prevent the overlap */
+    /* Fix the specific overlap in expander headers */
     div[data-testid="stExpander"] summary p {
-        font-family: "Times New Roman", Times, serif !important;
+        display: inline;
         margin-left: 0.5rem;
     }
 
@@ -85,7 +90,7 @@ for sub_name, info in data["subjects"].items():
                     mu = info["bc_mean"]
                     sigma = (info["bc_max"] - info["bc_min"]) / 6
                 
-                # Z-score to Percentile
+                # z-score to Percentile
                 z = (raw_score - mu) / sigma if sigma != 0 else 0
                 final_score = stats.norm.cdf(z) * 100
             except: final_score = raw_score
@@ -132,7 +137,7 @@ with tab_view:
                 st.write(f"**{sub_name}**")
                 st.caption(f"Final: {score:.2f} {metric_suffix}")
             with col_bar:
-                # Normalizing for bar (French is /20, Sing is /5)
+                # Normalising for bar (French is /20, Sg is /5)
                 norm = 20.0 if data["system"] == "French" else 5.0
                 st.progress(min(score / norm, 1.0))
 
@@ -167,7 +172,7 @@ with tab_edit:
     # 4. Edit Subjects
     for sub_name, info in list(data["subjects"].items()):
         with st.expander(f"Edit {sub_name}"):
-            # Singapore Bell Curve Settings
+            # Singapore bell curve settings
             if data["system"] == "Singapore":
                 info["bell_curve"] = st.checkbox("Enable Bell Curve Calculation", value=info.get("bell_curve", False), key=f"bc_{sub_name}")
                 if info["bell_curve"]:
@@ -184,7 +189,7 @@ with tab_edit:
             # Components
             for c_name, c_data in list(info["components"].items()):
                 ca, cb, cc = st.columns([2, 2, 1])
-                # Note: In Sg, grades are usually % / 100. In French, / 20.
+                # In Sg, grades are usually % / 100. In France, / 20.
                 limit = 100.0 if data["system"] == "Singapore" else 20.0
                 g = ca.number_input(f"Grade: {c_name}", 0.0, limit, float(c_data['grade']), key=f"g_{sub_name}_{c_name}")
                 w = cb.number_input(f"Weight %: {c_name}", 0, 100, int(c_data['weight']), key=f"w_{sub_name}_{c_name}")
