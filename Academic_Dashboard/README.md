@@ -4,17 +4,22 @@ Made this streamlit dashboard for myself initially as I wanted to visualise the 
 
 ---
 
-## One-Click
+## Intended Use
+
+I suggest that inputted grades should either be grades that have already been confirmed, or grades of the most recent mock paper attempted.
+
+---
+
+## Web Version
 
 If you want to see whether or not this would be useful to you, this is a good place to start. However if you're looking for something more long-term, I recommend running this locally on your machine. (Explained below)
 
-If you don't want to install anything, just use the **Web Version**:
 1. Open https://acadash.streamlit.app
 2. **To save it as an App on your Phone/Laptop:**
    - **On iPhone (Safari):** Tap 'Share' -> 'Add to Home Screen'.
    - **On Android (Chrome):** Tap the three dots -> 'Install app'.
    - **On Laptop (Chrome/Edge):** Click the 'Install' icon in the address bar (right side).
-3. This will put a **🎓 Icon** on your desktop/home screen and open the dashboard in its own clean window.
+3. This will put a **👑 Icon** on your desktop/home screen and open the dashboard in its own clean window.
 
 ---
 
@@ -29,3 +34,11 @@ Ensure you have Python installed.
 Clone this repo and install these libraries:
 ```bash
 pip install streamlit pandas scipy
+```
+
+### 3. Run
+In your terminal, run:
+```bash
+cd Downloads/Academic-Dashboard-Franco-Singaporean--main/Academic_Dashboard
+streamlit run app.py
+```
